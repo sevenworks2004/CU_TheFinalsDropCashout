@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <!--Set this to your project's name-->
+    <ProjectName>TheFinalsDropCashout</ProjectName>
+    <!--Set this to the game's main folder-->
+    <BaseGamePath>E:/SteamLibrary/steamapps/common/Casualties Unknown Demo</BaseGamePath>
+    <BepInExDir>$(BaseGamePath)/BepInEx</BepInExDir>
+    <GameAssembliesDir>$(BaseGamePath)/CasualtiesUnknown_Data/Managed</GameAssembliesDir>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,47 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build mod",
+      "type": "shell",
+      "command": "dotnet build",
+      "options": {
+        "cwd": "${workspaceFolder}/TheFinalsDropCashout" 
+      },
+
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+
+    {
+      "label": "Run CasualtiesUnknown",
+      "type": "shell",
+      "command":[
+        "Start-Process 'e:/SteamLibrary/steamapps/common/Casualties Unknown Demo/CasualtiesUnknown.exe'",
+      ],
+      "options": {
+        "env": {
+          // "WARMBOOT":"on",
+          // "WARMBOOT_COMMANDS":"test",
+          // "WARMBOOT_MODE":"course"
+
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false,
+        "clear": false
+      },
+      "dependsOn":[
+        "Build mod",
+      ]
+    }
+  ]
+}

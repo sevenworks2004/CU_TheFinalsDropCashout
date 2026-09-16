@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to Unity Game",
+            "type": "mono",
+            "request": "attach",
+            "address": "localhost",
+            "port": 10000,
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Start Game + Debug",
+            "configurations": [
+                "Attach to Unity Game"
+            ],
+            "preLaunchTask": "Run CasualtiesUnknown",
+            
+        }
+    ]
+}
