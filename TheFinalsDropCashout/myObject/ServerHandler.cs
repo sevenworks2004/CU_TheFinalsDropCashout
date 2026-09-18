@@ -169,7 +169,38 @@ public class ServerHandler
     }
     private void ServerRequestHandlerSuspendCashoutCollision(NetPlayer player, string arg2, string[] arg3)
     {
-        throw new NotImplementedException();
+        var id = int.Parse(arg3[1]);
+        var isHead = bool.Parse(arg3[2]);
+        Console.WriteLine($"Player: {player.body.name} Cashbox id : {id} isHead : {isHead}");
+        var obj = NetObjectRegistry.NetIdToSyncInfoDict.Get(new knetid{id = (ushort)id});
+        if (obj.go.TryGetComponent<Cashbox>(out Cashbox cashbox))
+        {
+            cashbox.isHand = isHead;
+            cashbox.plr = player;
+            if (!isHead)
+            {
+                cashbox.plr = null;
+            }
+            return;
+        }
+        Console.WriteLine("Error Not found");
+        return;
+    }
+    public static void isHeadItemCashbox(Cashbox cashbox,NetPlayer plr)
+    {
+        foreach (var obj in NetObjectRegistry.NetIdToSyncInfoDict)
+        {
+            if (!obj.Value.go.TryGetComponent<Cashbox>(out Cashbox cashbox1))continue;
+
+            if (cashbox1 == cashbox)
+            {
+                NetDataWriter writer = Net.CreateWriter(NetmsgId.SERVER_ClientCustomCommand);
+                writer.Put($"{IdCommandSuspendCashoutCollision} {obj.Key.id} {cashbox.isHand}");
+                Net.Client_Send(DeliveryMethod.ReliableSequenced,writer);
+                return;
+            }
+        }
+        Console.WriteLine("Error Object Cashout NotFound");
     }
 }
 class DataStatusCashout

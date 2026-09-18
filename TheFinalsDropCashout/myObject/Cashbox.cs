@@ -6,7 +6,7 @@ using KrokoshaCasualtiesMP;
 
 public class Cashbox : MonoBehaviour
 {
-    private bool isHead = false;
+    public bool isHand = false;
     private bool isAnowers = false;
     private string[] AnowersDialog = new[]
     {
@@ -14,7 +14,10 @@ public class Cashbox : MonoBehaviour
     };
     private Rigidbody2D rig;
     private DamagingCrate damg;
+    private Item item;
     private float collisionActivationDelay = 0.3f;
+    bool isChange = false;
+    public NetPlayer plr;
     private void Awake()
     {
         var sprRender = gameObject.GetComponent<SpriteRenderer>();
@@ -56,49 +59,70 @@ public class Cashbox : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Ground");
         rig = gameObject.GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
         damg = gameObject.GetComponent<DamagingCrate>() ?? gameObject.AddComponent<DamagingCrate>();
+        item = gameObject.GetComponent<Item>();
+        
     }
-
     public void Update()
     {
-
-        if (isHead && !isAnowers)
+        Body body = PlayerCamera.main?.body;
+        if (KrokoshaScavMultiplayer.is_client && KrokoshaScavMultiplayer.network_system_is_running)
         {
-            Body body = PlayerCamera.main?.body;
-            #if DEBUG
-            if (body == null)
+            NetPlayer player = NetPlayer.LOCAL_PLAYER;
+
+            if (body != null && body.HoldingItem(item) && body.alive)
             {
-                ConsoleScript.instance.LogToConsole("Error Body");
-                return;
+                isHand = true;
             }
-            #else
-            if (body == null) return;
-            #endif
-
-            using (CCLBody.Use(body))
+            else
             {
-                #if DEBUG
-                ConsoleScript.instance.LogToConsole("cashbox isHead");
-                #endif
-                CUCoreUtils.talk(AnowersDialog[UnityEngine.Random.Range(0, AnowersDialog.Length)]);
-                isAnowers = true;
+                isHand = false;
             }
+            if (isHand && !isChange)
+            {
+                isChange = true;
+                ServerHandler.isHeadItemCashbox(this, NetPlayer.LOCAL_PLAYER);
+            }
+            else if (!isHand && isChange)
+            {
+                isChange = false;
+                ServerHandler.isHeadItemCashbox(this, NetPlayer.LOCAL_PLAYER);
+            }
+            if (rig != null && damg != null)
+            {
+                if (isHand)
+                {
+                    damg.enabled = false;
+                    gameObject.layer = 7;
+                    collisionActivationDelay = 0.3f;
+                }
+                else
+                {
+                    if (collisionActivationDelay < 0.0f)
+                    {
+                        damg.enabled = true;
+                        gameObject.layer = 6;
+                    }
+                    else
+                    {
+                        collisionActivationDelay -= Time.deltaTime;
+                    }
+                }
+            }
+            return;
         }
-        else if (isAnowers && !isHead){
-            isAnowers = false;
-        }
-        if (CUCoreUtils.HasEquipped("cashbox(Clone)") || CUCoreUtils.HasEquipped("cashbox")){
-            isHead = true;
 
-
+        if ((body != null && body.alive && body.HoldingItem(item)) || plr != null)
+        {
+            isHand = true;
         }
         else
         {
-            isHead = false;
+            isHand = false;
         }
 
         if (rig != null && damg != null)
         {
-            if (isHead)
+            if (isHand)
             {
                 damg.enabled = false;
                 gameObject.layer = 7;
@@ -111,9 +135,11 @@ public class Cashbox : MonoBehaviour
                     damg.enabled = true;
                     gameObject.layer = 6;
                 }
-                else collisionActivationDelay -= Time.deltaTime;
+                else
+                {
+                    collisionActivationDelay -= Time.deltaTime;
+                }
             }
         }
-        
     }
 }
