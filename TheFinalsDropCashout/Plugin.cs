@@ -23,113 +23,45 @@ namespace ModThefinalsDropCashout
     [BepInPlugin(ModGUID, ModName, ModVersion)]
     public class Plugin : BaseUnityPlugin
     {
-        public const string ModGUID = "com.TheFinals.drop";
+        public const string ModGUID = "Seven.TheFinals.drop";
         public const string ModName = "The Finals Drop Cashout";
-        public const string ModVersion = "0.1.0";
+        public const string ModVersion = "0.1.8";
 
         internal static new ManualLogSource Logger;
         private readonly Harmony _harmony = new(ModGUID);
         public static Plugin Instance { get; private set; } = null!;
 
-        public static string bundleID = "bundle.game";
-
         void Awake()
         {
-            
             Logger = base.Logger;
             Instance = this;
+            loadConfig();
             // ContentReloadManager.EnableHotReload(ModGUID);
+            // PatchMenu.Patch();
             itemCashboxInit();
             objectCashoutInit();
             objectSuspendedCashboxInit();
             itemTabelTheFinalInit();
             ServerHandler.initServerHandler();
-            
-            _harmony.PatchAll(typeof(Plugin).Assembly);
             #if DEBUG
-            ConsoleCommandRegistry.Register(
-                "getObjects",
-                "Get all objects in range",
-                Action =>
-                {
-                Body body = PlayerCamera.main?.body;
-                if (body == null)
-                {
-                    ConsoleScript.instance.LogToConsole("Error Body");
-                    return;
-                }
-                if (!int.TryParse(Action[1], out int maxDistationSound) )
-                {
-                    ConsoleScript.instance.LogToConsole("Error maxDistationSound");
-                    return;
-                }
-                Collider2D[] colliders = Physics2D.OverlapCircleAll(
-                        body.transform.position,
-                        maxDistationSound
-                    );
-                    foreach (var col in colliders)
-                    {
-                        ConsoleScript.instance.LogToConsole(
-                            $"Object: {col.gameObject.name} | Position: {col.gameObject.transform.position}"
-                        );
-                        Console.WriteLine(
-                            $"Object: {col.gameObject.name} | Position: {col.gameObject.transform.position}"
-                        );
-                    }  
-                }
-            );
-            ConsoleCommandRegistry.Register(
-                "test",
-                "test",
-                Action =>
-                {
-                    if (MultiplayerApi.IsClient && MultiplayerApi.IsRunning)
-                    {
-                        Console.WriteLine("Error spawn test");
-                        return;
-                    }
-                    var body = PlayerCamera.main?.body;
-
-                    if (body == null)
-                    {
-                        ConsoleScript.instance.LogToConsole("Error Body");
-                        return;
-                    }
-                    var ob = CustomInstantiate.InstantiateReturn(
-                        "cashbox",
-                        body.transform.position,
-                        Quaternion.identity,
-                        1f
-                    );
-                    if (ob == null)
-                    {
-                        ConsoleScript.instance.LogToConsole("Error Ob");
-                        return;
-                    }
-                    Item it = ob?.GetComponent<Item>();
-                    if (it == null)
-                    {
-                        ConsoleScript.instance.LogToConsole("Error it");
-                        return;
-                    }
-                    body.PickUpItem(it,0,true);
-
-
-                    BuildingEntityRegistry.Spawn(
-                        "cashout",
-                        body.transform.position += Vector3.up,
-                        Quaternion.identity
-                    );
-
-                    BuildingEntityRegistry.Spawn(
-                        "suspebedCashbox",
-                        body.transform.position,
-                        Quaternion.identity
-                    );
-                }
-            );
+            TestFunction.initCommand();
             #endif
+            _harmony.PatchAll(typeof(Plugin).Assembly);
+
         }
+
+        private void loadConfig()
+        {
+            Cashout.configData = new ConfigCashout
+            {
+                timerCashout = Config.Bind("cashout","count_down_timer",60f,"time left Cashout").Value,
+                timerActiveExplod = Config.Bind("cashout","countdown_timer_explosion",3f,"countdown to explosion").Value,
+                randomChanceExplide = Config.Bind("cashout","explosion_chance",0.030f,"Random chance of explosion").Value,
+                countEnemy = Config.Bind("cashout","count_spawn_enemy",3,"number of monster spawns").Value,
+
+            };
+        }
+
         private void objectSuspendedCashboxInit()
         {
             Sprite suspebedCashboxSprite = AssetLoader.LoadEmbeddedSprite(
@@ -238,14 +170,6 @@ namespace ModThefinalsDropCashout
 
         void itemTabelTheFinalInit()
         {
-            // if (AssetLoader.RegisterBundleFromPluginFolder(this,bundleID,"bundles/game") )
-            // {
-            //     Console.WriteLine("Load bundle OK");
-            // }
-            // else
-            // {
-            //     Console.WriteLine("Error Bundle load");
-            // }
             Sprite knowledgeTheFinals_sprite = AssetLoader.LoadEmbeddedSprite(
                 "Assets.tabel.tabel.png",
                 50f

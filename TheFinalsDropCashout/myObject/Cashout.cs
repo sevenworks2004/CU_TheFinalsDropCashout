@@ -17,6 +17,7 @@ using HarmonyLib;
 
 public class Cashout : MonoBehaviour
 {
+    public static ConfigCashout configData;
     private UsableObject usable;
     private AudioSource audioSourceAlaram;
     private AudioSource audioSourceMusic;
@@ -34,7 +35,7 @@ public class Cashout : MonoBehaviour
         public float timerCashout = 30;
         private float printTimer = 2;
     #else 
-        public float timerCashout = 60;
+        public float timerCashout = configData.timerCashout;
     #endif
 
     public bool isFinised = false;
@@ -111,20 +112,20 @@ public class Cashout : MonoBehaviour
     private float happineAdd = 30f;
     private float happineLimit = 50;
 
-    private int countEnemy = 3;
+    private int countEnemy = configData.countEnemy;
     private float radiusMinEnemySpawn = 5f; // Минимальная дистанция от кашаута
     private float raduisEnemuSpawn = 20f;   // Максимальная дистанция
     private string nameEnemy = "overgrowntick";
 
     #if DEBUG
-    private double randomChanceExplide = 0.030;
+    private double randomChanceExplide = configData.randomChanceExplide;
     #else
-    private double randomChanceExplide = 0.015;
+    private double randomChanceExplide = configData.randomChanceExplide;
     #endif
     private double timerRandomCachceExplide = 3;
     private System.Random random = new System.Random();
     public bool isCashoutActiveExplod;
-    public float timerActiveExplod = 3;
+    public float timerActiveExplod = configData.timerActiveExplod;
     private string usableString = "Insert Cashbox";
 
 
@@ -240,8 +241,8 @@ public class Cashout : MonoBehaviour
         // usable = gameObject.AddComponent<UsableObject>();
         // usable.toggleString = usableString;
         // usable.didLangString = true;
- 
     }
+
 
     public void OnTriggerEnter2D(Collider2D collider)
     {
@@ -695,4 +696,13 @@ public class GlitchSound
             }
         }
     }
+}
+
+public class ConfigCashout
+{
+    public float timerCashout;
+    public float timerActiveExplod;
+    public float randomChanceExplide;
+    public int countEnemy;
+
 }
