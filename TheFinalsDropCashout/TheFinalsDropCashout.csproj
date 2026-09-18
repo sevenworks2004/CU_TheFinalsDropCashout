@@ -18,6 +18,9 @@
 
   <ItemGroup>
 
+    <EmbeddedResource Include="Assets/MenuButton/Tablet_Menu.png" />
+    <EmbeddedResource Include="Assets/MenuButton/Tablet_Shadow.png" />
+
     <EmbeddedResource Include="Assets/ImpendingDoom_Moodle.png" />
     <EmbeddedResource Include="Assets/tabel/tableUi.png" />
     
