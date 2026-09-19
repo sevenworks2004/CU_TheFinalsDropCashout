@@ -37,7 +37,7 @@ namespace ModThefinalsDropCashout
             Instance = this;
             loadConfig();
             // ContentReloadManager.EnableHotReload(ModGUID);
-            // PatchMenu.Patch();
+            PatchMenu.Patch();
             itemCashboxInit();
             objectCashoutInit();
             objectSuspendedCashboxInit();
@@ -47,7 +47,6 @@ namespace ModThefinalsDropCashout
             TestFunction.initCommand();
             #endif
             _harmony.PatchAll(typeof(Plugin).Assembly);
-
         }
 
         private void loadConfig()
@@ -58,7 +57,6 @@ namespace ModThefinalsDropCashout
                 timerActiveExplod = Config.Bind("cashout","countdown_timer_explosion",3f,"countdown to explosion").Value,
                 randomChanceExplide = Config.Bind("cashout","explosion_chance",0.030f,"Random chance of explosion").Value,
                 countEnemy = Config.Bind("cashout","count_spawn_enemy",3,"number of monster spawns").Value,
-
             };
         }
 
